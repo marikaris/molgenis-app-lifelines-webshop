@@ -30,7 +30,7 @@
           <tr>
             <th></th>
             <td>
-              <button class="ll-facet-option btn btn-sm selectAll gridItem btn-outline-secondary"
+              <button class="ll-facet-option btn btn-sm selectAll selectButton gridItem btn-outline-secondary"
                       @click="toggleGrid"
                       @mouseenter="onMouseEnter('gridItem')"
                       @mouseleave="onMouseLeave('gridItem')">
@@ -40,8 +40,9 @@
             <td v-for="(assessment, colIndex) in gridAssessments"
                 :key="assessment.id"
             >
-              <button class="ll-facet-option btn btn-sm selectCol gridItem btn-outline-secondary"
-                      @click="selectColumn(assessment.id)"
+              <button class="ll-facet-option btn btn-sm selectCol selectButton gridItem btn-outline-secondary"
+                      :class="'grid-select-col-'+colIndex"
+                      @click="selectColumn(assessment.id, colIndex)"
                       @mouseenter="onMouseEnter('grid-button-col-'+colIndex)"
                       @mouseleave="onMouseLeave('grid-button-col-'+colIndex)">
                 <font-awesome-icon icon="arrow-down"/>
@@ -60,8 +61,9 @@
           </span>
             </th>
             <td>
-              <button class="ll-facet-option btn btn-sm selectRow gridItem btn-outline-secondary"
-                      @click="toggleRow(gridVariables[rowIndex].id)"
+              <button class="ll-facet-option btn btn-sm selectRow selectButton gridItem btn-outline-secondary"
+                      :class="'grid-select-row-'+rowIndex"
+                      @click="toggleRow(gridVariables[rowIndex].id, rowIndex)"
                       @mouseenter="onMouseEnter('grid-button-row-'+rowIndex)"
                       @mouseleave="onMouseLeave('grid-button-row-'+rowIndex)">
                 <font-awesome-icon icon="arrow-right"/>
@@ -100,8 +102,11 @@ export default Vue.extend({
     formatter (num) {
       return Math.abs(num) > 999 ? Math.sign(num) * ((Math.abs(num) / 1000).toFixed(1)) + 'k' : Math.sign(num) * Math.abs(num)
     },
-    selectColumn (assessmentId) {
+    selectColumn (assessmentId, colIndex) {
+      const colButton = document.getElementsByClassName('grid-select-col-' + colIndex)[0]
+      console.log(this.isDeSelectedColumn(colIndex))
       this.toggleGridColumn({ assessmentId })
+      this.isDeSelectedColumn(colIndex) ? this.makeInActive(colButton) : this.makeActive(colButton)
     },
     onMouseEnter (className) {
       const collection = Array.from(document.getElementsByClassName(className))
@@ -111,11 +116,13 @@ export default Vue.extend({
       const collection = Array.from(document.getElementsByClassName(className))
       collection.forEach((button) => button.classList.remove('gridHover'))
     },
-    toggleRow (variableId) {
+    toggleRow (variableId, rowIndex) {
+      const rowButton = document.getElementsByClassName('grid-select-row-' + rowIndex)[0]
       this.toggleGridRow({
         variableId,
         gridAssessments: this.gridAssessments
       })
+      this.isSelectedRow(rowIndex) ? this.makeActive(rowButton) : this.makeInActive(rowButton)
     },
     getGridCellClass (rowIndex, colIndex) {
       const selected = !!this.gridSelections[rowIndex][colIndex]
@@ -124,7 +131,33 @@ export default Vue.extend({
       const rowClass = ' grid-button-row-' + rowIndex
       return selectedClass + rowClass + colClass
     },
+    makeActive (button) {
+      if (!button.classList.contains('btn-secondary')) {
+        button.classList.add('btn-secondary')
+        button.classList.remove('btn-outline-secondary')
+      }
+    },
+    makeInActive (button) {
+      if (!button.classList.contains('btn-outline-secondary')) {
+        button.classList.add('btn-outline-secondary')
+        button.classList.remove('btn-secondary')
+      }
+    },
+    isSelectedRow (rowId) {
+      return this.grid[rowId].length === this.gridSelections[rowId].filter(value => value).length
+    },
+    isDeSelectedColumn (colId) {
+      console.log('blaat', this.gridSelections, colId)
+      this.gridSelections.forEach((rowId) => {
+        console.log(this.gridSelections[rowId])
+      //   if (!this.gridSelections[rowId][colId]) {
+      //     return true
+      //   }/
+      })
+    },
     toggleGrid () {
+      const selectButtons = Array.from(document.getElementsByClassName('selectButton'))
+      selectButtons.forEach((button) => this.toggleActiveClasses(button))
       this.toggleAll({ gridAssessments: this.gridAssessments })
     },
     toggle (rowIndex, colIndex) {
