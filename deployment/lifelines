@@ -33,7 +33,7 @@ give --role ANONYMOUS read --entity-type lifelines_variant
 give --role ANONYMOUS read --entity-type lifelines_subsection_variable
 
 # Import data model and i18n labels
-import attributes
+import attributes --in lifelines
 import sys_L10nString
 
 # Import the lifelines data
