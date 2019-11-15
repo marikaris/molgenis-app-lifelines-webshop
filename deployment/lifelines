@@ -4,7 +4,7 @@ $wait If you haven't set the password for the user in this script, kill it now a
 add group lifelines
 
 # Create user
-add user ll_admin --set-password xxxxx
+add user ll_admin --set-password ll_admin
 make ll_admin lifelines_manager
 
 $wait Create custom role LIFELINES_SHOPPER and add group "lifelines" to role
@@ -15,6 +15,10 @@ give --role ANONYMOUS read --plugin app
 # Give ANONYMOUS package permissions
 give --role ANONYMOUS readmeta --package lifelines
 give --role ANONYMOUS read --package sys_md
+
+# Import data model and i18n labels
+import attributes --in lifelines
+import sys_L10nString
 
 # Give ANONYMOUS count permissions
 give --role ANONYMOUS count --entity-type lifelines_who
@@ -31,10 +35,6 @@ give --role ANONYMOUS read --entity-type lifelines_sub_section
 give --role ANONYMOUS read --entity-type lifelines_tree
 give --role ANONYMOUS read --entity-type lifelines_variant
 give --role ANONYMOUS read --entity-type lifelines_subsection_variable
-
-# Import data model and i18n labels
-import attributes
-import sys_L10nString
 
 # Import the lifelines data
 $wait Please import all the lifelines data
